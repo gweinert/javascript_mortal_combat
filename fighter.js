@@ -20,6 +20,7 @@ MC.FighterModule = (function(){
     this.punching = false;
     this.hit = false;
     this.color = color;
+    this.crouch = false;
 
   }
 
@@ -38,18 +39,24 @@ MC.FighterModule = (function(){
   };
 
   Fighter.prototype.crouchFighter = function(){
-    this.pos.y += 20;
-    this.height -= 20;
-    self = this;
-    setTimeout( function(){
-      self.pos.y -=20;
-      self.height += 20;
-    }, 1000);
+    if (this.pos.y > 170 ){
+      this.pos.y += 50; //20
+      this.height -= 20;
+      this.crouch = true;
+
+      self = this;
+      setTimeout( function(){
+        self.pos.y -=50; //20
+        self.height += 20;
+        self.crouch = false;
+      }, 1000);
+    }
   };
 
   Fighter.prototype.fighterPunch = function(){
     this.punching = true;
-    console.log("punch");
+    
+    //keeps from button mashing punches
     self = this;
     setTimeout( function(){
       self.punching = false;
@@ -65,7 +72,7 @@ MC.FighterModule = (function(){
   };
 
   Fighter.prototype.takeDamageFrom = function(enemy){
-    if(enemy.punching && this.inRange(enemy)){
+    if( enemy.crouch === false && ( enemy.punching && this.inRange(enemy)) ){
       this.health -= 20;
       this.hit = true;
       setTimeout( function(){
@@ -74,10 +81,6 @@ MC.FighterModule = (function(){
       var self = this;
       console.log(self + "is being hit"+this.hit);
     }
-    // else{
-    //   this.hit = false;
-    //   console.log(this + "is being hit"+this.hit);
-    // }
   };
 
   Fighter.prototype.inRange = function(enemy){

@@ -14,38 +14,42 @@ MC.MainModule = (function(){
   var AI;
   var startAIPunchTime = new Date().getTime();
   var startPlayer1JumpTime = new Date().getTime();
+  var startPlayer1CrouchTime = new Date().getTime();
   var players = [];
 
+  //builds players
+  //listener
+  //starts loop
   function init(){
-    console.log("Initializing Main...");
     
     MC.FighterModule.buildFighter();
     MC.FighterModule.buildEnemy();
     
+    //create list of players for animating
     player1 = MC.FighterModule.fighter;
     players.push(player1);
-    console.log(players);
     AI = MC.FighterModule.enemy;
     players.push(AI);
 
     _listenForKeyCodes();
+    
 
+    // MC.Renderer.drawOtherSpriteGame();
     _startGameLoop();
   }
+
+  
 
   function _startGameLoop(){
     var gameLoop = setInterval(function(){
 
-      
-      // MC.Renderer.drawBg();
-      // MC.Renderer.drawEnemy();
-      // MC.Renderer.drawFighter();
-
       MC.Renderer.drawGame(MC.MainModule.players);
-      
+
+      //checks player direction for animating
       player1.setPunchDirectionTo(AI);
       AI.setPunchDirectionTo(player1);
       
+      //constantly moves AI to player
       AIMoveToPlayer();
       
       if(new Date().getTime() - startAIPunchTime > 5000){
@@ -85,7 +89,10 @@ MC.MainModule = (function(){
   }
 
   function crouch(){
-    player1.crouchFighter();
+    if(new Date().getTime() - startPlayer1CrouchTime > 2000){
+      player1.crouchFighter();
+      startPlayer1CrouchTime = new Date().getTime();
+    }
   }
 
   function punch(){
@@ -106,10 +113,14 @@ MC.MainModule = (function(){
 
   function AIMoveToPlayer(){
     if(player1.pos.x > AI.pos.x){
-      AI.pos.x += 2;
+      if(Math.abs(player1.pos.x - AI.pos.x) > 30){
+        AI.pos.x += 2;
+      }
     }
     else{
-      AI.pos.x -= 2;
+      if(Math.abs(player1.pos.x - AI.pos.x) > 30){
+        AI.pos.x -= 2;
+      }
     }
   }
 
